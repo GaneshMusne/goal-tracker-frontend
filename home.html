@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title>Calendar</title>
+  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Font Link for Icons -->
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+</head>
+
+<body>
+  <div class="wrapper">
+    <div class="quote">
+      <p>There are no quick fixes. But, by taking action just a little bit every day, you will build up a powerful
+        reservoir of confidence, self-esteem, and discipline.</p>
+    </div>
+    <div class="counter">
+      <span class="counter-txt">Day Count : <span class="counter-count"></span></span>
+    </div>
+    <header>
+      <p class="current-date"></p>
+      <div class="icons">
+        <span id="prev" class="material-symbols-rounded">chevron_left</span>
+        <span id="next" class="material-symbols-rounded">chevron_right</span>
+      </div>
+    </header>
+    <div class="calendar">
+      <ul class="weeks">
+        <li>Sun</li>
+        <li>Mon</li>
+        <li>Tue</li>
+        <li>Wed</li>
+        <li>Thu</li>
+        <li>Fri</li>
+        <li>Sat</li>
+      </ul>
+      <ul class="days"></ul>
+    </div>
+    <div class="btn-div">
+      <button class="btn">Achieved</button>
+    </div>
+  </div>
+  <script type="module">
+
+    const url = 'https://goal-tracker-backend-qvge.onrender.com/api/goals';
+
+    const btn = document.querySelector("button");
+    const today = new Date();
+
+    btn.disabled = true;
+    if (today.getHours() >= 21) {
+      btn.disabled = false;
+    }
+
+    btn.addEventListener("click", ()=>{
+      
+      let str ="" + today.getDate() + "/" + (today.getMonth() + 1) + "/" + today.getFullYear();
+      const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        date:str
+      })
+    };
+
+      fetch(url, options)
+        .then(response => response.json())
+        .then(data => console.log(data))
+        .catch(error => console.error(error));
+    })
+
+
+
+
+    fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      let prevData = []
+      for(let i=0; i<data.length; i++){
+        prevData.push(data[i].date);
+      }
+      console.log(prevData);
+
+      const daysTag = document.querySelector(".days")
+      const currentDate = document.querySelector(".current-date")
+      const prevNextIcon = document.querySelectorAll(".icons span")
+
+
+
+      let date = new Date()
+      let currDay = date.getDate();
+      let currYear = date.getFullYear()
+      let currMonth = date.getMonth()
+
+
+      const months = ["January", "February", "March", "April", "May", "June", "July",
+        "August", "September", "October", "November", "December"];
+
+      const monthsDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+      const counter = document.querySelector(".counter-count");
+      let count = 0;
+      let allDates = prevData;
+      let currToday = (currDay) + "/" + (currMonth + 1) + "/" + currYear;
+      let fullYesterdayDate = new Date(date);
+      fullYesterdayDate.setDate(date.getDate() - 1);
+      let yesterday = fullYesterdayDate.getDate() + "/" + (fullYesterdayDate.getMonth() + 1) + "/" + fullYesterdayDate.getFullYear()
+
+      for (let i = 0; i < allDates.length - 1; i++) {
+        
+        let currDate = allDates[i].split("/");
+        let currDay = parseInt(currDate[0]);
+        let currMonth = parseInt(currDate[1]);
+        let nextDate = allDates[i + 1].split("/");
+        let nextDay = parseInt(nextDate[0]);
+
+        if (nextDay == currDay + 1) {
+          count += 1;
+        } else if (currDay == monthsDays[currMonth - 1]) {
+          if (nextDay == 1) {
+            count += 1;
+          } else {
+            count = 0;
+          }
+        } else {
+          count = 0;
+        }
+      }
+      console.log(count);
+
+      counter.innerHTML = (count + 1);
+
+      const renderCalendar = () => {
+        let firstDayofMonth = new Date(currYear, currMonth, 1).getDay()
+        let lastDateofMonth = new Date(currYear, currMonth + 1, 0).getDate()
+        let lastDayofMonth = new Date(currYear, currMonth, lastDateofMonth).getDay()
+        let lastDateofLastMonth = new Date(currYear, currMonth, 0).getDate()
+        let liTag = ""
+
+        for (let i = firstDayofMonth; i > 0; i--) {
+          liTag += `<li class="inactive"></li>`;
+        }
+
+        for (let i = 1; i <= lastDateofMonth; i++) {
+          let isToday = i === date.getDate() && currMonth === new Date().getMonth()
+            && currYear === new Date().getFullYear() ? "active" : "";
+
+          let currDate = new Date("" + currYear + "-" + (currMonth + 1) + "-" + i);
+          liTag += `<li class="${prevData.includes("" + i + "/" + (currMonth + 1) + "/" + currYear) ? "active" : ""} ${isToday && !(prevData.includes("" + i + "/" + (currMonth + 1) + "/" + currYear)) ? "today" : ""} ${!(isToday) && (currDate < date) && !(prevData.includes("" + i + "/" + (currMonth + 1) + "/" + currYear)) ? "not-achived" : ""} " >${prevData.includes("" + i + "/" + (currMonth + 1) + "/" + currYear) ? "&#10004;" : i}</li>`;
+        }
+
+        for (let i = lastDayofMonth; i < 6; i++) {
+          liTag += `<li class="inactive"></li>`
+        }
+        currentDate.innerText = `${months[currMonth]} ${currYear}`;
+        daysTag.innerHTML = liTag;
+      }
+      renderCalendar();
+
+      prevNextIcon.forEach(icon => {
+        icon.addEventListener("click", () => {
+          currMonth = icon.id === "prev" ? currMonth - 1 : currMonth + 1;
+
+          if (currMonth < 0 || currMonth > 11) {
+            date = new Date(currYear, currMonth, new Date().getDate());
+            currYear = date.getFullYear();
+            currMonth = date.getMonth();
+          } else {
+            date = new Date();
+          }
+          renderCalendar();
+        });
+      });
+
+      
+    })
+    .catch(error => console.error(error));
+
+  </script>
+</body>
+
+</html>
