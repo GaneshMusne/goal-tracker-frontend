@@ -49,6 +49,7 @@
 
     const btn = document.querySelector("button");
     const today = new Date();
+    let str ="" + today.getDate() + "/" + (today.getMonth() + 1) + "/" + today.getFullYear();
 
     btn.disabled = true;
     if (today.getHours() >= 21) {
@@ -57,7 +58,6 @@
 
     btn.addEventListener("click", ()=>{
       
-      let str ="" + today.getDate() + "/" + (today.getMonth() + 1) + "/" + today.getFullYear();
       const options = {
       method: 'POST',
       headers: {
@@ -84,7 +84,10 @@
       for(let i=0; i<data.length; i++){
         prevData.push(data[i].date);
       }
-      console.log(prevData);
+      // console.log(prevData);
+      if(prevData[prevData.length-1] === str){
+        btn.disabled = true;
+      }
 
       const daysTag = document.querySelector(".days")
       const currentDate = document.querySelector(".current-date")
@@ -131,7 +134,7 @@
           count = 0;
         }
       }
-      console.log(count);
+      // console.log(count);
 
       counter.innerHTML = (count + 1);
 
