@@ -148,4 +148,3 @@ submitBtn.addEventListener("click", () => {
 // Start by fetching the goals
 initializeApp();
 fetchGoals();
-setInterval(fetchGoals, 10000);
