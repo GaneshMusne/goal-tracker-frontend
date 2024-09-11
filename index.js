@@ -1,4 +1,4 @@
-const API_URL = 'https://goal-tracker-backend-qvge.onrender.com/api/goals';
+const API_URL = 'https://goal-tracker-backend-dtcd.onrender.com/api/goals';
 let goalDates = [];
 
 const submitBtn = document.querySelector("button");
