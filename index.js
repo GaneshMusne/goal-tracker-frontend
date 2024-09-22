@@ -55,7 +55,7 @@ function initializeApp() {
 
 // Update the streak counter based on consecutive days
 function updateStreakCounter() {
-    const streakCounter = document.querySelector(".counter-count");
+    // const streakCounter = document.querySelector(".counter-count");
     let streakCount = 0;
 
     for (let i = 0; i < goalDates.length - 1; i++) {
@@ -69,7 +69,7 @@ function updateStreakCounter() {
         }
     }
 
-    streakCounter.textContent = streakCount + 1;
+    // streakCounter.textContent = streakCount + 1;
 }
 
 // Render the calendar with goal dates marked
